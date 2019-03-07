@@ -186,8 +186,7 @@ Attributes:
                     if addr not in self.avoid_addresses:
                         self.avoid_addresses.append(addr)
                     self.avoid = addr
-            binja.log_info("Avoided Address List: {0}".format(
-                [hex(x) for x in self.avoid_addresses]))
+                    binja.log_info("Avoid address: 0x{0:0x}".format(addr))
         except:
             show_message_box("Afl-Unicorn", "Error please open git issue !",
                              MessageBoxButtonSet.OKButtonSet, MessageBoxIcon.ErrorIcon)
