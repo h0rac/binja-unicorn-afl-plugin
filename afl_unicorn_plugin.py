@@ -271,8 +271,7 @@ Attributes:
         input_file.close()
     
     def test_unicorn_setup(self, bv):
-        print("we are here")
-        test_folder = '/home/horac/Research/afl-unicorn/unicorn_mode/tplink/tdpd'
+        #TO DO add UI menu
         output = subprocess.Popen(['python', '/home/horac/Research/afl-unicorn/unicorn_mode/tplink/tdpd/tdpd_test_harness.py', '-d', '/home/horac/Research/afl-unicorn/unicorn_mode/tplink/tdpd/UnicornContext_20190303_132130', '/home/horac/Research/afl-unicorn/unicorn_mode/tplink/tdpd/inputs/sample1.bin'], stdout = subprocess.PIPE).communicate()[0]
         binja.log_info(output)
         
