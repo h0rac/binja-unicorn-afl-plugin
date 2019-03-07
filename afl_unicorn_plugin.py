@@ -8,12 +8,74 @@ import binaryninja as binja
 from binaryninja.binaryview import BinaryViewType
 from binaryninja import _binaryninjacore as core
 import binaryninja.interaction as interaction
-from binaryninja.plugin import PluginCommand
-from binaryninja.interaction import show_plain_text_report, show_message_box, get_form_input, OpenFileNameField, get_open_filename_input, get_save_filename_input
+from binaryninja.plugin import PluginCommand, BackgroundTaskThread
+from binaryninja.interaction import show_plain_text_report, show_message_box, get_form_input, SeparatorField, OpenFileNameField, get_open_filename_input, get_save_filename_input, DirectoryNameField
 from binaryninja.highlight import HighlightColor
 from binaryninja.enums import HighlightStandardColor, MessageBoxButtonSet, MessageBoxIcon
 import json
+import subprocess
+import os
+import signal
 
+process = None
+
+class AflUnicornRunner(BackgroundTaskThread):
+
+    def __init__(self, view):
+        BackgroundTaskThread.__init__(self, "Vulnerability research with afl-unicorn fuzzer started...", True)
+        self.view = view
+        self.afl_binary = None
+        self.dumped_memory = None
+        self.inputs = None
+        self.outputs = None
+        self.harness_file = None
+        self.runner = None
+        self.proc = None
+
+    def run(self):
+        binja.log_info("Starting afl-unicorn fuzzing")
+        separator = SeparatorField()
+        afl_binary = OpenFileNameField('Select afl-fuzz')
+        dumped_memory = DirectoryNameField('Select folder with dumped memory')
+        inputs = DirectoryNameField('Select inputs folder')
+        outputs = DirectoryNameField('Select outputs folder')
+        harness_file = OpenFileNameField('Select harness test file')
+        get_form_input([separator, afl_binary, dumped_memory, inputs, outputs, harness_file], "Afl-unicorn Fuzzing Menu")
+        binja.log_info("Selected afl-fuzz binary: {0}".format(afl_binary.result))
+        binja.log_info("Selected dumped memory folder: {0}".format(dumped_memory.result))
+        binja.log_info("Selected inputs folder: {0}".format(inputs.result))
+        binja.log_info("Selected outputs folder: {0}".format(outputs.result))
+        binja.log_info("Selected harness test file: {0}".format(harness_file.result))
+
+        try:
+            if(len(afl_binary.result) <=0 or len(dumped_memory.result) <= 0 or len(inputs.result) <= 0 or len(outputs.result) <= 0 or len(harness_file.result) <=0):
+                show_message_box("Afl-Unicorn", "All fields are required !",
+                                                MessageBoxButtonSet.OKButtonSet, MessageBoxIcon.ErrorIcon)
+                return
+            self.afl_binary = afl_binary.result
+            self.dumped_memory = dumped_memory.result
+            self.inputs = inputs.result
+            self.outputs = outputs.result
+            self.harness_file = harness_file.result
+
+            global process
+            process = subprocess.Popen([self.afl_binary, '-U' ,'-m' ,'none','-i', self.inputs, '-o', self.outputs, '--', 'python', self.harness_file, self.dumped_memory, '@@'],  preexec_fn=os.setsid)
+            binja.log_info('Process {0} started'.format(os.getpgid(process.pid)))
+        except TypeError:
+            pass
+        
+    
+    @classmethod
+    def cancel_task(self, bv):
+        binja.log_info("Cancel process {0}".format(os.getpgid(process.pid)))
+        os.killpg(os.getpgid(process.pid), signal.SIGTERM) 
+
+
+    @classmethod
+    def fuzz(self, bv):
+        # Start a runner thread
+        self.runner = AflUnicornRunner(bv)
+        self.runner.start()
 
 class AflUnicornUI(PluginCommand):
     """Afl-unicorn UI extenstion class
@@ -25,19 +87,24 @@ Attributes:
 """
 
     def __init__(self):
-        super(AflUnicornUI, self).register_for_address("Set as Start Address:",
+        super(AflUnicornUI, self).register_for_address("Set as Start Address",
                                                        "Set unicorn-afl starting point address", self.set_start_address)
-        super(AflUnicornUI, self).register_for_address("Set as End Address:",
+        super(AflUnicornUI, self).register_for_address("Set as End Address",
                                                        "Set unicorn-afl end point address", self.set_end_address)
-        super(AflUnicornUI, self).register_for_address("Avoid this Address:",
+        super(AflUnicornUI, self).register_for_address("Avoid this Address",
                                                        "Avoid unicorn-afl address during emulation", self.avoid_address)
-        super(AflUnicornUI, self).register("Clear Avoided Addresses:",
+        super(AflUnicornUI, self).register("Clear Avoided Addresses",
                                            "Clear avoided addresses", self.clear_avoided_addresses)
-        super(AflUnicornUI, self).register("Save Data for Harness Test:",
+        super(AflUnicornUI, self).register("Save Data for Harness Test",
                                            "Save for afl-unicron tests", self.save_data)
-        super(AflUnicornUI, self).register("Load Data from File:",
+        super(AflUnicornUI, self).register("Load Data from File",
                                            "Load data for afl-unicron tests", self.load_data)
-
+        super(AflUnicornUI, self).register("Start Fuzzing with afl-unicorn",
+                                           "Test unicorn execution for afl-unicron", AflUnicornRunner.fuzz)
+        super(AflUnicornUI, self).register("Stop Fuzzing with afl-unicorn",
+                                           "Stop unicorn execution for afl-unicron", AflUnicornRunner.cancel_task)
+        super(AflUnicornUI, self).register("Test emulation with afl-unicorn",
+                                           "Unicorn emulation execution for afl-unicron", self.test_harness)
         self.start = 0
         self.end = 0
         self.avoid_addresses = []
@@ -204,7 +271,26 @@ Attributes:
         for addr in harness_data['avoid_addresses']:
             self.avoid_address(bv, addr)
         input_file.close()
+    
+    def test_harness(self, bv):
+        separator = SeparatorField()
+        dumped_memory = DirectoryNameField('Select folder with dumped memory')
+        input_file = OpenFileNameField('Select input file')
+        harness_file = OpenFileNameField('Select harness test file')
+        get_form_input([separator, dumped_memory, input_file, harness_file], "Afl-unicorn Harness Test Menu")
+        binja.log_info("Selected dumped memory folder: {0}".format(dumped_memory.result))
+        binja.log_info("Selected input file: {0}".format(input_file.result))
+        binja.log_info("Selected harness test file: {0}".format(harness_file.result))
 
+        try:
+            if(len(dumped_memory.result) <= 0 or len(input_file.result) <= 0 or len(harness_file.result) <=0):
+                show_message_box("Afl-Unicorn", "All fields are required !",
+                                                MessageBoxButtonSet.OKButtonSet, MessageBoxIcon.ErrorIcon)
+                return
+            output = subprocess.Popen(['python', harness_file.result, '-d', dumped_memory.result, input_file.result], stdout = subprocess.PIPE).communicate()[0]
+            binja.log_info(output) 
+        except TypeError:
+            pass
 
 if __name__ == "__main__":
     pass
