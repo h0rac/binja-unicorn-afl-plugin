@@ -7,6 +7,6 @@ UI Binary Ninja plugin for afl-unicorn
 #### b) start is uint start address
 #### c) end is uint end address
 
-JSON data: {"start: 0x00402f6c, end: 0x00402ce8, avoided addresses: []"}
+JSON data: {"start": 0x00402f6c, "end": 0x00402ce8, "avoided_addresses": []}
 
 Data is also saved as json with same format. Save data could be loaded to harness tests of afl-unicorn project
