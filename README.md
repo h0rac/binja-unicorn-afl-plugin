@@ -1,2 +1,2 @@
 # binja-unicorn-afl-plugin
-UI plugin for afl-unicorn project
+UI Binary Ninja plugin for afl-unicorn project
