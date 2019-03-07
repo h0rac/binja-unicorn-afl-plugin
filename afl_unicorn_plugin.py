@@ -103,6 +103,8 @@ Attributes:
                                            "Test unicorn execution for afl-unicron", AflUnicornRunner.fuzz)
         super(AflUnicornUI, self).register("Stop Fuzzing with afl-unicorn",
                                            "Stop unicorn execution for afl-unicron", AflUnicornRunner.cancel_task)
+        super(AflUnicornUI, self).register("Test emulation with afl-unicorn",
+                                           "Unicorn emulation execution for afl-unicron", self.test_harness)
         self.start = 0
         self.end = 0
         self.avoid_addresses = []
@@ -270,12 +272,25 @@ Attributes:
             self.avoid_address(bv, addr)
         input_file.close()
     
-    def test_unicorn_setup(self, bv):
-        #TO DO add UI menu
-        output = subprocess.Popen(['python', '/home/horac/Research/afl-unicorn/unicorn_mode/tplink/tdpd/tdpd_test_harness.py', '-d', '/home/horac/Research/afl-unicorn/unicorn_mode/tplink/tdpd/UnicornContext_20190303_132130', '/home/horac/Research/afl-unicorn/unicorn_mode/tplink/tdpd/inputs/sample1.bin'], stdout = subprocess.PIPE).communicate()[0]
-        binja.log_info(output)
-        
+    def test_harness(self, bv):
+        separator = SeparatorField()
+        dumped_memory = DirectoryNameField('Select folder with dumped memory')
+        input_file = OpenFileNameField('Select input file')
+        harness_file = OpenFileNameField('Select harness test file')
+        get_form_input([separator, dumped_memory, input_file, harness_file], "Afl-unicorn Harness Test Menu")
+        binja.log_info("Selected dumped memory folder: {0}".format(dumped_memory.result))
+        binja.log_info("Selected input file: {0}".format(input_file.result))
+        binja.log_info("Selected harness test file: {0}".format(harness_file.result))
 
+        try:
+            if(len(dumped_memory.result) <= 0 or len(input_file.result) <= 0 or len(harness_file.result) <=0):
+                show_message_box("Afl-Unicorn", "All fields are required !",
+                                                MessageBoxButtonSet.OKButtonSet, MessageBoxIcon.ErrorIcon)
+                return
+            output = subprocess.Popen(['python', harness_file.result, '-d', dumped_memory.result, input_file.result], stdout = subprocess.PIPE).communicate()[0]
+            binja.log_info(output) 
+        except TypeError:
+            pass
 
 if __name__ == "__main__":
     pass
