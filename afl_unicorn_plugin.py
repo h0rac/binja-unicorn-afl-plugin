@@ -63,7 +63,7 @@ class AflUnicornRunner(BackgroundTaskThread):
         self.inputs = inputs.result
         self.outputs = outputs.result
         self.harness_file = harness_file.result
-        self.json_file = json_file
+        self.json_file = json_file.result
 
         try:
             global process
