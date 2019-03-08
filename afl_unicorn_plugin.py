@@ -29,6 +29,7 @@ class AflUnicornRunner(BackgroundTaskThread):
         self.inputs = None
         self.outputs = None
         self.harness_file = None
+        self.json_file = None
         self.runner = None
         self.proc = None
 
@@ -40,12 +41,13 @@ class AflUnicornRunner(BackgroundTaskThread):
         inputs = DirectoryNameField('Select inputs folder')
         outputs = DirectoryNameField('Select outputs folder')
         harness_file = OpenFileNameField('Select harness test file')
-        get_form_input([separator, afl_binary, dumped_memory, inputs, outputs, harness_file], "Afl-unicorn Fuzzing Menu")
+        json_file = OpenFileNameField('Select json data file')
+        get_form_input([separator, afl_binary, dumped_memory, json_file, inputs, outputs, harness_file], "Afl-unicorn Fuzzing Menu")
 
-        if(inputs.result == None or afl_binary.result == None or dumped_memory.result == None or outputs.result == None or harness_file.result == None):
+        if(inputs.result == None or afl_binary.result == None or dumped_memory.result == None or outputs.result == None or harness_file.result == None or json_file.result == None):
             return
 
-        if(len(afl_binary.result) <=0 or len(dumped_memory.result) <= 0 or len(inputs.result) <= 0 or len(outputs.result) <= 0 or len(harness_file.result) <=0):
+        if(len(afl_binary.result) <=0 or len(dumped_memory.result) <= 0 or len(inputs.result) <= 0 or len(outputs.result) <= 0 or len(harness_file.result) <=0 or len(json_file.result) <= 0):
             show_message_box("Afl-Unicorn", "All fields are required !",
                                             MessageBoxButtonSet.OKButtonSet, MessageBoxIcon.ErrorIcon)
             return
@@ -53,6 +55,7 @@ class AflUnicornRunner(BackgroundTaskThread):
         binja.log_info("Selected dumped memory folder: {0}".format(dumped_memory.result))
         binja.log_info("Selected inputs folder: {0}".format(inputs.result))
         binja.log_info("Selected outputs folder: {0}".format(outputs.result))
+        binja.log_info("Selected json data file: {0}".format(json_file.result))
         binja.log_info("Selected harness test file: {0}".format(harness_file.result))
 
         self.afl_binary = afl_binary.result
@@ -60,10 +63,11 @@ class AflUnicornRunner(BackgroundTaskThread):
         self.inputs = inputs.result
         self.outputs = outputs.result
         self.harness_file = harness_file.result
+        self.json_file = json_file
 
         try:
             global process
-            process = subprocess.Popen([self.afl_binary, '-U' ,'-m' ,'none','-i', self.inputs, '-o', self.outputs, '--', 'python', self.harness_file, self.dumped_memory, '@@'],  preexec_fn=os.setsid)
+            process = subprocess.Popen([self.afl_binary, '-U' ,'-m' ,'none','-i', self.inputs, '-o', self.outputs, '--', 'python', self.harness_file, self.json_file, self.dumped_memory, '@@'],  preexec_fn=os.setsid)
             binja.log_info('Process {0} started'.format(os.getpgid(process.pid)))
         except:
             show_message_box("Afl-Unicorn", "Error please open git issue !",
@@ -118,6 +122,7 @@ Attributes:
         self.dumped_memory = None
         self.input_file = None
         self.harness_file = None
+        self.json_file = None
 
     def set_start_address(self, bv, addr):
         if(addr in self.avoid_addresses):
@@ -286,26 +291,29 @@ Attributes:
         separator = SeparatorField()
         dumped_memory = DirectoryNameField('Select folder with dumped memory')
         input_file = OpenFileNameField('Select input file')
+        json_file = OpenFileNameField('Select json data file')
         harness_file = OpenFileNameField('Select harness test file')
-        get_form_input([separator, dumped_memory, input_file, harness_file], "Afl-unicorn Harness Test Menu")
+        get_form_input([separator, dumped_memory, input_file, harness_file, json_file], "Afl-unicorn Harness Test Menu")
 
-        if(dumped_memory.result == None or input_file.result == None or harness_file.result == None):
+        if(dumped_memory.result == None or input_file.result == None or harness_file.result == None or json_file == None):
             return
 
-        if(len(dumped_memory.result) <= 0 or len(input_file.result) <= 0 or len(harness_file.result) <=0):
+        if(len(dumped_memory.result) <= 0 or len(input_file.result) <= 0 or len(harness_file.result) <=0 or len(json_file.result) <=0):
             show_message_box("Afl-Unicorn", "All fields are required !",
                                             MessageBoxButtonSet.OKButtonSet, MessageBoxIcon.ErrorIcon)
             return
         binja.log_info("Selected dumped memory folder: {0}".format(dumped_memory.result))
         binja.log_info("Selected input file: {0}".format(input_file.result))
+        binja.log_info("Selected json data file: {0}".format(json_file.result))
         binja.log_info("Selected harness test file: {0}".format(harness_file.result))
         
         self.input_file = input_file
         self.dumped_memory = dumped_memory
         self.harness_file = harness_file
+        self.json_file = json_file
 
         try:
-            output = subprocess.Popen(['python', self.harness_file.result, '-d', self.dumped_memory.result, self.input_file.result], stdout = subprocess.PIPE).communicate()[0]
+            output = subprocess.Popen(['python', self.harness_file.result, '-d', self.json_file.result, self.dumped_memory.result, self.input_file.result], stdout = subprocess.PIPE).communicate()[0]
             binja.log_info(output) 
 
         except TypeError:
