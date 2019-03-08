@@ -7,7 +7,7 @@
     Unicorn Context Dumper scripts.
 
     Author:
-        Nathan Voss <njvoss299@gmail.com>
+        Nathan Voss <njvoss299@gmail.com> Modified and extended by h0rac 
 """
 
 import argparse
