@@ -19,7 +19,6 @@ import signal
 
 process = None
 
-
 class AflUnicornRunner(BackgroundTaskThread):
 
     def __init__(self):
@@ -31,8 +30,6 @@ class AflUnicornRunner(BackgroundTaskThread):
         self.outputs = None
         self.harness_file = None
         self.json_file = None
-        self.runner = None
-        self.proc = None
 
     def run(self):
         self._start_afl_fuzz(self.afl_binary, self.inputs, self.outputs, self.harness_file, self.json_file, self.dumped_memory)
@@ -63,9 +60,8 @@ class AflUnicornRunner(BackgroundTaskThread):
         self.outputs = outputs
         self.harness_file = harness_file
         self.json_file = json_file
-        # Start threada runner 
+        # Start thread runner 
         runner.start()
-
 
 class AflUnicornUI(PluginCommand):
     """Afl-unicorn UI extenstion class
@@ -111,12 +107,10 @@ Attributes:
         self.afl_dumped_memory = None 
         self.afl_binary = None
 
-    def _display_afl_menu(self, afl_binary, dumped_memory, json_file, inputs, outputs, harness_file, title):
-        form_menu = get_form_input([afl_binary, dumped_memory, json_file,
-                        inputs, outputs, harness_file], title)
+    def _display_menu(self, items, title):
+        form_menu = get_form_input(items, title)
         return form_menu
 
-    
     def _clear_fuzz_data(self):
         self.afl_json_file = None
         self.afl_harness_file = None
@@ -124,7 +118,6 @@ Attributes:
         self.afl_outputs = None
         self.afl_dumped_memory = None 
         self.afl_binary = None
-
 
     def start_afl_fuzzing(self, bv):
 
@@ -146,7 +139,7 @@ Attributes:
         afl_runner = AflUnicornRunner()
 
         if(self.afl_dumped_memory != None or self.afl_json_file != None or self.afl_inputs !=  None or self.afl_harness_file != None or self.afl_outputs != None or self.afl_binary != None):
-            form_menu = self._display_afl_menu(self.afl_binary.result, self.afl_dumped_memory.result, self.afl_json_file.result, self.afl_inputs.result, self.afl_outputs.result, self.afl_harness_file.result,  "Afl-unicorn Fuzzing Menu")
+            form_menu = self._display_menu([self.afl_binary.result, self.afl_dumped_memory.result, self.afl_json_file.result, self.afl_inputs.result, self.afl_outputs.result, self.afl_harness_file.result],  "Afl-unicorn Fuzzing Menu")
             if form_menu == True:
                    afl_runner.fuzz(afl_runner, self.afl_binary, self.afl_dumped_memory, self.afl_json_file , self.afl_inputs, self.afl_outputs, self.afl_harness_file)
             else:
@@ -154,9 +147,8 @@ Attributes:
                                             MessageBoxButtonSet.YesNoButtonSet, MessageBoxIcon.WarningIcon)
                 if(result == 1):
                     self._clear_fuzz_data()
-       
         else:
-             form_menu = self._display_afl_menu(afl_binary, dumped_memory, json_file, inputs, outputs, harness_file,  "Afl-unicorn Fuzzing Menu")
+             form_menu = self._display_menu([afl_binary, dumped_memory, json_file, inputs, outputs, harness_file],  "Afl-unicorn Fuzzing Menu")
 
         if(inputs.result == None or afl_binary.result == None or dumped_memory.result == None or outputs.result == None or harness_file.result == None or json_file.result == None):
             return
@@ -356,10 +348,6 @@ Attributes:
             show_message_box("Afl-Unicorn", "Error please open git issue !",
                              MessageBoxButtonSet.OKButtonSet, MessageBoxIcon.ErrorIcon)
 
-    def _display_menu(self, dumped_memory, input_file, harness_file, json_file, title):
-            form_menu = get_form_input([dumped_memory, input_file,
-                    harness_file, json_file ], title)
-            return form_menu
 
     def _clear_harness_data(self):
         self.dumped_memory = None
@@ -377,7 +365,7 @@ Attributes:
 
         if(self.dumped_memory != None or self.json_file != None or self.input_file !=  None or self.harness_file != None):
             
-            form_menu = self._display_menu(self.dumped_memory.result, self.input_file.result, self.harness_file.result, self.json_file.result, "Afl-unicorn Harness Test Menu")
+            form_menu = self._display_menu([self.dumped_memory.result, self.input_file.result, self.harness_file.result, self.json_file.result], "Afl-unicorn Harness Test Menu")
             if form_menu == True:
                 self._start_unicorn_emulation(self.harness_file, self.json_file, self.dumped_memory, self.input_file)
             else:
@@ -387,7 +375,7 @@ Attributes:
                     self._clear_harness_data()
        
         else:
-            form_menu = self._display_menu(dumped_memory, input_file, harness_file, json_file, "Afl-unicorn Harness Test Menu")
+            form_menu = self._display_menu([dumped_memory, input_file, harness_file, json_file], "Afl-unicorn Harness Test Menu")
 
         if(dumped_memory.result == None or input_file.result == None or harness_file.result == None or json_file == None):
             return
