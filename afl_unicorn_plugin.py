@@ -22,10 +22,9 @@ process = None
 
 class AflUnicornRunner(BackgroundTaskThread):
 
-    def __init__(self, view):
+    def __init__(self):
         BackgroundTaskThread.__init__(
             self, "Vulnerability research with afl-unicorn fuzzer started...", True)
-        self.view = view
         self.afl_binary = None
         self.dumped_memory = None
         self.inputs = None
@@ -36,16 +35,128 @@ class AflUnicornRunner(BackgroundTaskThread):
         self.proc = None
 
     def run(self):
+        self._start_afl_fuzz(self.afl_binary, self.inputs, self.outputs, self.harness_file, self.json_file, self.dumped_memory)
+
+    def _start_afl_fuzz(self, afl_binary, inputs, outputs, harness_file, json_file, dumped_memory):
+        try:
+            global process
+            process = subprocess.Popen([afl_binary.result, '-U', '-m', 'none', '-i', inputs.result, '-o', outputs.result,
+                                        '--', 'python', harness_file.result, json_file.result, dumped_memory.result, '@@'],  preexec_fn=os.setsid)
+            binja.log_info('Process {0} started'.format(
+                os.getpgid(process.pid)))
+        except:
+            show_message_box("Afl-Unicorn", "Error please open git issue !",
+                             MessageBoxButtonSet.OKButtonSet, MessageBoxIcon.ErrorIcon)
+
+    def cancel_task(self):
+        global process
+        if(process):
+            binja.log_info("Cancel process {0}".format(
+                os.getpgid(process.pid)))
+            os.killpg(os.getpgid(process.pid), signal.SIGTERM)
+            process = None
+
+    def fuzz(self, runner, afl_binary, dumped_memory, json_file, inputs, outputs, harness_file):
+        self.afl_binary = afl_binary
+        self.dumped_memory = dumped_memory
+        self.inputs = inputs
+        self.outputs = outputs
+        self.harness_file = harness_file
+        self.json_file = json_file
+        # Start threada runner 
+        runner.start()
+
+
+class AflUnicornUI(PluginCommand):
+    """Afl-unicorn UI extenstion class
+
+Attributes:
+    start: Starting address in code section
+    end:  End address in code section
+            avoid_addresses: Addresses that should be skipped during execution of unicorn
+"""
+    def __init__(self):
+        
+        super(AflUnicornUI, self).register_for_address("Set as Start Address",
+                                                       "Set unicorn-afl starting point address", self.set_start_address)
+        super(AflUnicornUI, self).register_for_address("Set as End Address",
+                                                       "Set unicorn-afl end point address", self.set_end_address)
+        super(AflUnicornUI, self).register_for_address("Avoid this Address",
+                                                       "Avoid unicorn-afl address during emulation", self.avoid_address)
+        super(AflUnicornUI, self).register("Clear Avoided Addresses",
+                                           "Clear avoided addresses", self.clear_avoided_addresses)
+        super(AflUnicornUI, self).register("Save Data for Harness Test",
+                                           "Save for afl-unicron tests", self.save_data)
+        super(AflUnicornUI, self).register("Load Data from File",
+                                           "Load data for afl-unicron tests", self.load_data)
+        super(AflUnicornUI, self).register("Start Fuzzing with afl-unicorn",
+                                           "Test unicorn execution for afl-unicron",self.start_afl_fuzzing)
+        super(AflUnicornUI, self).register("Stop Fuzzing with afl-unicorn",
+                                           "Stop unicorn execution for afl-unicron", AflUnicornRunner.cancel_task)
+        super(AflUnicornUI, self).register("Test emulation with afl-unicorn",
+                                           "Unicorn emulation execution for afl-unicron", self.test_harness)
+        self.start = 0
+        self.end = 0
+        self.avoid_addresses = []
+        self.avoid = 0
+        self.dumped_memory = None
+        self.input_file = None
+        self.json_file = None
+        self.harness_file = None
+
+        self.afl_json_file = None
+        self.afl_harness_file = None
+        self.afl_inputs = None
+        self.afl_outputs = None
+        self.afl_dumped_memory = None 
+        self.afl_binary = None
+
+    def _display_afl_menu(self, afl_binary, dumped_memory, json_file, inputs, outputs, harness_file, title):
+        form_menu = get_form_input([afl_binary, dumped_memory, json_file,
+                        inputs, outputs, harness_file], title)
+        return form_menu
+
+    
+    def _clear_fuzz_data(self):
+        self.afl_json_file = None
+        self.afl_harness_file = None
+        self.afl_inputs = None
+        self.afl_outputs = None
+        self.afl_dumped_memory = None 
+        self.afl_binary = None
+
+
+    def start_afl_fuzzing(self, bv):
+
+        global process
+        if process != None:
+            show_message_box("Afl-Unicorn", "Afl-unicorn fuzzing process is running already, stop it first",
+                                MessageBoxButtonSet.OKButtonSet, MessageBoxIcon.WarningIcon)
+            return
+
+        form_menu = False
         binja.log_info("Starting afl-unicorn fuzzing")
-        separator = SeparatorField()
         afl_binary = OpenFileNameField('Select afl-fuzz')
         dumped_memory = DirectoryNameField('Select folder with dumped memory')
         inputs = DirectoryNameField('Select inputs folder')
         outputs = DirectoryNameField('Select outputs folder')
         harness_file = OpenFileNameField('Select harness test file')
         json_file = OpenFileNameField('Select json data file')
-        get_form_input([separator, afl_binary, dumped_memory, json_file,
-                        inputs, outputs, harness_file], "Afl-unicorn Fuzzing Menu")
+
+        afl_runner = AflUnicornRunner()
+
+        if(self.afl_dumped_memory != None or self.afl_json_file != None or self.afl_inputs !=  None or self.afl_harness_file != None or self.afl_outputs != None or self.afl_binary != None):
+            form_menu = self._display_afl_menu(self.afl_binary.result, self.afl_dumped_memory.result, self.afl_json_file.result, self.afl_inputs.result, self.afl_outputs.result, self.afl_harness_file.result,  "Afl-unicorn Fuzzing Menu")
+            if form_menu == True:
+                   afl_runner.fuzz(afl_runner, self.afl_binary, self.afl_dumped_memory, self.afl_json_file , self.afl_inputs, self.afl_outputs, self.afl_harness_file)
+            else:
+                result = show_message_box("Afl-Unicorn", "Do you want to clear test data ?",
+                                            MessageBoxButtonSet.YesNoButtonSet, MessageBoxIcon.WarningIcon)
+                if(result == 1):
+                    self._clear_fuzz_data()
+       
+        else:
+             form_menu = self._display_afl_menu(afl_binary, dumped_memory, json_file, inputs, outputs, harness_file,  "Afl-unicorn Fuzzing Menu")
 
         if(inputs.result == None or afl_binary.result == None or dumped_memory.result == None or outputs.result == None or harness_file.result == None or json_file.result == None):
             return
@@ -64,73 +175,15 @@ class AflUnicornRunner(BackgroundTaskThread):
         binja.log_info(
             "Selected harness test file: {0}".format(harness_file.result))
 
+        self.afl_binary = afl_binary
+        self.afl_dumped_memory = dumped_memory
+        self.afl_inputs = inputs
+        self.afl_outputs = outputs
+        self.afl_harness_file = harness_file
+        self.afl_json_file = json_file
 
-        self.afl_binary = afl_binary.result
-        self.dumped_memory = dumped_memory.result
-        self.inputs = inputs.result
-        self.outputs = outputs.result
-        self.harness_file = harness_file.result
-        self.json_file = json_file.result
-
-        try:
-            global process
-            process = subprocess.Popen([self.afl_binary, '-U', '-m', 'none', '-i', self.inputs, '-o', self.outputs,
-                                        '--', 'python', self.harness_file, self.json_file, self.dumped_memory, '@@'],  preexec_fn=os.setsid)
-            binja.log_info('Process {0} started'.format(
-                os.getpgid(process.pid)))
-        except:
-            show_message_box("Afl-Unicorn", "Error please open git issue !",
-                             MessageBoxButtonSet.OKButtonSet, MessageBoxIcon.ErrorIcon)
-
-    @classmethod
-    def cancel_task(self, bv):
-        if(process):
-            binja.log_info("Cancel process {0}".format(
-                os.getpgid(process.pid)))
-            os.killpg(os.getpgid(process.pid), signal.SIGTERM)
-
-    @classmethod
-    def fuzz(self, bv):
-        # Start a runner thread
-        self.runner = AflUnicornRunner(bv)
-        self.runner.start()
-
-
-class AflUnicornUI(PluginCommand):
-    """Afl-unicorn UI extenstion class
-
-Attributes:
-    start: Starting address in code section
-    end:  End address in code section
-            avoid_addresses: Addresses that should be skipped during execution of unicorn
-"""
-    def __init__(self):
-        super(AflUnicornUI, self).register_for_address("Set as Start Address",
-                                                       "Set unicorn-afl starting point address", self.set_start_address)
-        super(AflUnicornUI, self).register_for_address("Set as End Address",
-                                                       "Set unicorn-afl end point address", self.set_end_address)
-        super(AflUnicornUI, self).register_for_address("Avoid this Address",
-                                                       "Avoid unicorn-afl address during emulation", self.avoid_address)
-        super(AflUnicornUI, self).register("Clear Avoided Addresses",
-                                           "Clear avoided addresses", self.clear_avoided_addresses)
-        super(AflUnicornUI, self).register("Save Data for Harness Test",
-                                           "Save for afl-unicron tests", self.save_data)
-        super(AflUnicornUI, self).register("Load Data from File",
-                                           "Load data for afl-unicron tests", self.load_data)
-        super(AflUnicornUI, self).register("Start Fuzzing with afl-unicorn",
-                                           "Test unicorn execution for afl-unicron", AflUnicornRunner.fuzz)
-        super(AflUnicornUI, self).register("Stop Fuzzing with afl-unicorn",
-                                           "Stop unicorn execution for afl-unicron", AflUnicornRunner.cancel_task)
-        super(AflUnicornUI, self).register("Test emulation with afl-unicorn",
-                                           "Unicorn emulation execution for afl-unicron", self.test_harness)
-        self.start = 0
-        self.end = 0
-        self.avoid_addresses = []
-        self.avoid = 0
-        self.dumped_memory = None
-        self.input_file = None
-        self.json_file = None
-        self.harness_file = None
+        if form_menu == True:
+            afl_runner.fuzz(afl_runner, self.afl_binary, self.afl_dumped_memory, self.afl_json_file , self.afl_inputs, self.afl_outputs, self.afl_harness_file)
 
     def set_start_address(self, bv, addr):
         if(addr in self.avoid_addresses):
