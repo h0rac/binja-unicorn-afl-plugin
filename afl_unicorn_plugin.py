@@ -50,10 +50,13 @@ class AflUnicornRunner(BackgroundTaskThread):
     def cancel_task(self):
         global process
         if(process):
-            binja.log_info("Cancel process {0}".format(
-                os.getpgid(process.pid)))
-            os.killpg(os.getpgid(process.pid), signal.SIGTERM)
-            process = None
+            result = show_message_box("Afl-Unicorn", "Do you want to cancel afl-unicorn fuzzing ?",
+                             MessageBoxButtonSet.YesNoButtonSet, MessageBoxIcon.WarningIcon)
+            if result == 1:
+                binja.log_info("Cancel process {0}".format(
+                    os.getpgid(process.pid)))
+                os.killpg(os.getpgid(process.pid), signal.SIGTERM)
+                process = None
 
     def fuzz(self, runner, afl_binary, dumped_memory, json_file, inputs, outputs, harness_file):
         self.afl_binary = afl_binary
