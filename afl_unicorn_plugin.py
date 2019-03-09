@@ -73,10 +73,17 @@ Attributes:
 """
     def __init__(self):
         
-        super(AflUnicornUI, self).register_for_address("Set as Start Address",
+        super(AflUnicornUI, self).register_for_address("Start Address\Set",
                                                        "Set unicorn-afl starting point address", self.set_start_address)
-        super(AflUnicornUI, self).register_for_address("Set as End Address",
+
+        super(AflUnicornUI, self).register("Start Address\Clear",
+                                                       "Clear unicorn-afl starting point address", self.clear_start_address)
+
+        super(AflUnicornUI, self).register_for_address("End Address\Set",
                                                        "Set unicorn-afl end point address", self.set_end_address)
+        super(AflUnicornUI, self).register("End Address\Clear",
+                                                       "Clear unicorn-afl end point address", self.clear_end_address)
+
         super(AflUnicornUI, self).register_for_address("Avoid this Address",
                                                        "Avoid unicorn-afl address during emulation", self.avoid_address)
         super(AflUnicornUI, self).register("Clear Avoided Addresses",
@@ -91,8 +98,8 @@ Attributes:
                                            "Stop unicorn execution for afl-unicron", AflUnicornRunner.cancel_task)
         super(AflUnicornUI, self).register("Test emulation with afl-unicorn",
                                            "Unicorn emulation execution for afl-unicron", self.test_harness)
-        self.start = 0
-        self.end = 0
+        self.start = None
+        self.end = None
         self.avoid_addresses = []
         self.avoid = 0
         self.dumped_memory = None
@@ -177,6 +184,26 @@ Attributes:
         if form_menu == True:
             afl_runner.fuzz(afl_runner, self.afl_binary, self.afl_dumped_memory, self.afl_json_file , self.afl_inputs, self.afl_outputs, self.afl_harness_file)
 
+    def clear_start_address(self, bv):
+        if self.start:
+            start_block = bv.get_basic_blocks_at(self.start)
+            self.clear_address(start_block, self.start)
+            self.start = None
+        else:
+            show_message_box("Afl-Unicorn", "Start address not set !",
+                                            MessageBoxButtonSet.OKButtonSet, MessageBoxIcon.WarningIcon)
+            return
+
+    def clear_end_address(self, bv):
+        if self.end:
+            end_block = bv.get_basic_blocks_at(self.end)
+            self.clear_address(end_block, self.end)
+            self.end = None
+        else:
+            show_message_box("Afl-Unicorn", "End address not set !",
+                                            MessageBoxButtonSet.OKButtonSet, MessageBoxIcon.WarningIcon)
+            return
+
     def set_start_address(self, bv, addr):
         if(addr in self.avoid_addresses):
             show_message_box("Afl-Unicorn", "Address is already avoided, can't be used as Start !",
@@ -185,7 +212,7 @@ Attributes:
         try:
             blocks = bv.get_basic_blocks_at(addr)
             for block in blocks:
-                if(addr != self.start and self.start != 0):
+                if(addr != self.start and self.start != None):
                     block.function.set_auto_instr_highlight(
                         self.start, HighlightStandardColor.NoHighlightColor)
                     block.function.set_auto_instr_highlight(
@@ -208,7 +235,7 @@ Attributes:
         try:
             blocks = bv.get_basic_blocks_at(addr)
             for block in blocks:
-                if(addr != self.end and self.end != 0):
+                if(addr != self.end and self.end != None):
                     block.function.set_auto_instr_highlight(
                         self.end, HighlightStandardColor.NoHighlightColor)
                     block.function.set_auto_instr_highlight(
