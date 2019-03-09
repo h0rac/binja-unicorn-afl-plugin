@@ -308,7 +308,7 @@ Attributes:
                              MessageBoxButtonSet.OKButtonSet, MessageBoxIcon.ErrorIcon)
 
     def save_data(self, bv):
-        if(self.start == self.end or self.start == 0 or self.end == 0):
+        if(self.start == self.end or self.start == None or self.end == None):
             show_message_box("Afl-Unicorn", "Start and End addresses not set!",
                                             MessageBoxButtonSet.OKButtonSet, MessageBoxIcon.ErrorIcon)
             return
@@ -331,26 +331,30 @@ Attributes:
         for x in block:
             x.function.set_auto_instr_highlight(
                 addr, HighlightStandardColor.NoHighlightColor)
+        addr = None
 
     def clear_data(self, bv):
+        try:
+            if self.start:
+                start_block = bv.get_basic_blocks_at(self.start)
+                self.clear_address(start_block, self.start)
+            if self.end:
+                end_block = bv.get_basic_blocks_at(self.end)
+                self.clear_address(end_block, self.end)
+            if len(self.avoid_addresses) > 0:
+                for addr in self.avoid_addresses:
+                    blocks = bv.get_basic_blocks_at(addr)
+                    for block in blocks:
+                        block.function.set_auto_instr_highlight(
+                            addr, HighlightStandardColor.NoHighlightColor)
+            self.start = None
+            self.end = None
+            self.avoid = None
+            self.avoid_addresses.clear()
+        except:
+             show_message_box("Afl-Unicorn", "Error whhen clear data!",
+                             MessageBoxButtonSet.OKButtonSet, MessageBoxIcon.ErrorIcon)
 
-        if self.start == None or self.end == None:
-            show_message_box("Afl-Unicorn", "No data to clear...",
-                             MessageBoxButtonSet.OKButtonSet, MessageBoxIcon.WarningIcon)
-            return
-        start_block = bv.get_basic_blocks_at(self.start)
-        end_block = bv.get_basic_blocks_at(self.end)
-        self.clear_address(start_block, self.start)
-        self.clear_address(end_block, self.end)
-        for addr in self.avoid_addresses:
-            blocks = bv.get_basic_blocks_at(addr)
-            for block in blocks:
-                block.function.set_auto_instr_highlight(
-                    addr, HighlightStandardColor.NoHighlightColor)
-        self.start = None
-        self.end = None
-        self.avoid = None
-        self.avoid_addresses.clear()
 
     def load_data(self, bv):
         prompt_file = get_open_filename_input("filename")
