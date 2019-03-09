@@ -11,7 +11,7 @@ import binaryninja.interaction as interaction
 from binaryninja.plugin import PluginCommand, BackgroundTaskThread
 from binaryninja.interaction import show_plain_text_report, show_message_box, get_form_input, SeparatorField, OpenFileNameField, get_open_filename_input, get_save_filename_input, DirectoryNameField
 from binaryninja.highlight import HighlightColor
-from binaryninja.enums import HighlightStandardColor, MessageBoxButtonSet, MessageBoxIcon
+from binaryninja.enums import HighlightStandardColor, MessageBoxButtonSet, MessageBoxIcon, MessageBoxButtonResult
 import json
 import subprocess
 import os
@@ -63,6 +63,7 @@ class AflUnicornRunner(BackgroundTaskThread):
         binja.log_info("Selected json data file: {0}".format(json_file.result))
         binja.log_info(
             "Selected harness test file: {0}".format(harness_file.result))
+
 
         self.afl_binary = afl_binary.result
         self.dumped_memory = dumped_memory.result
@@ -126,11 +127,10 @@ Attributes:
         self.end = 0
         self.avoid_addresses = []
         self.avoid = 0
-        self.dumped_memory = DirectoryNameField(
-            'Select folder with dumped memory')
-        self.input_file = OpenFileNameField('Select input file')
-        self.json_file = OpenFileNameField('Select json data file')
-        self.harness_file = OpenFileNameField('Select harness test file')
+        self.dumped_memory = None
+        self.input_file = None
+        self.json_file = None
+        self.harness_file = None
 
     def set_start_address(self, bv, addr):
         if(addr in self.avoid_addresses):
@@ -293,35 +293,72 @@ Attributes:
             self.avoid_address(bv, addr)
         input_file.close()
 
-    def test_harness(self, bv):
-        separator = SeparatorField()
-        get_form_input([separator, self.dumped_memory, self.input_file,
-                        self.harness_file, self.json_file], "Afl-unicorn Harness Test Menu")
 
-        if(self.dumped_memory.result == None or self.input_file.result == None or self.harness_file.result == None or self.json_file == None):
+    def _start_unicorn_emulation(self, harness_file, json_file, dumped_memory, input_file):
+        try:
+            output = subprocess.Popen(['python', harness_file.result, '-d', json_file.result,
+                                        dumped_memory.result, input_file.result], stdout=subprocess.PIPE).communicate()[0]
+            binja.log_info(output)
+        except TypeError:
+            show_message_box("Afl-Unicorn", "Error please open git issue !",
+                             MessageBoxButtonSet.OKButtonSet, MessageBoxIcon.ErrorIcon)
+
+    def _display_menu(self, dumped_memory, input_file, harness_file, json_file, title):
+            form_menu = get_form_input([dumped_memory, input_file,
+                    harness_file, json_file ], title)
+            return form_menu
+
+    def _clear_harness_data(self):
+        self.dumped_memory = None
+        self.input_file = None
+        self.harness_file = None
+        self.json_file = None
+
+    def test_harness(self, bv):
+        form_menu = False
+        dumped_memory = DirectoryNameField(
+            'Select folder with dumped memory')
+        input_file = OpenFileNameField('Select input file')
+        json_file = OpenFileNameField('Select json data file')
+        harness_file = OpenFileNameField('Select harness test file')
+
+        if(self.dumped_memory != None or self.json_file != None or self.input_file !=  None or self.harness_file != None):
+            
+            form_menu = self._display_menu(self.dumped_memory.result, self.input_file.result, self.harness_file.result, self.json_file.result, "Afl-unicorn Harness Test Menu")
+            if form_menu == True:
+                self._start_unicorn_emulation(self.harness_file, self.json_file, self.dumped_memory, self.input_file)
+            else:
+                result = show_message_box("Afl-Unicorn", "Do you want to clear test data ?",
+                                            MessageBoxButtonSet.YesNoButtonSet, MessageBoxIcon.WarningIcon)
+                if(result == 1):
+                    self._clear_harness_data()
+       
+        else:
+            form_menu = self._display_menu(dumped_memory, input_file, harness_file, json_file, "Afl-unicorn Harness Test Menu")
+
+        if(dumped_memory.result == None or input_file.result == None or harness_file.result == None or json_file == None):
             return
 
-        if(len(self.dumped_memory.result) <= 0 or len(self.input_file.result) <= 0 or len(self.harness_file.result) <= 0 or len(self.json_file.result) <= 0):
+        if(len(dumped_memory.result) <= 0 or len(input_file.result) <= 0 or len(harness_file.result) <= 0 or len(json_file.result) <= 0):
             show_message_box("Afl-Unicorn", "All fields are required !",
                                             MessageBoxButtonSet.OKButtonSet, MessageBoxIcon.ErrorIcon)
             return
         binja.log_info("Selected dumped memory folder: {0}".format(
-            self.dumped_memory.result))
+            dumped_memory.result))
         binja.log_info("Selected input file: {0}".format(
-            self.input_file.result))
+            input_file.result))
         binja.log_info("Selected json data file: {0}".format(
-            self.json_file.result))
+            json_file.result))
         binja.log_info("Selected harness test file: {0}".format(
-            self.harness_file.result))
+            harness_file.result))
 
-        try:
-            output = subprocess.Popen(['python', self.harness_file.result, '-d', self.json_file.result,
-                                       self.dumped_memory.result, self.input_file.result], stdout=subprocess.PIPE).communicate()[0]
-            binja.log_info(output)
+        self.dumped_memory = dumped_memory
+        self.input_file = input_file
+        self.json_file = json_file
+        self.harness_file = harness_file
 
-        except TypeError:
-            show_message_box("Afl-Unicorn", "Error please open git issue !",
-                             MessageBoxButtonSet.OKButtonSet, MessageBoxIcon.ErrorIcon)
+        if form_menu == True:
+            self._start_unicorn_emulation(self.harness_file, self.json_file, self.dumped_memory, self.input_file)
 
 if __name__ == "__main__":
     pass
