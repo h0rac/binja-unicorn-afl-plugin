@@ -1,0 +1,742 @@
+{
+    "arch": {
+        "arch": "mipsel"
+    },
+    "regs": {
+        "a0": 6,
+        "v0": 1,
+        "ra": 4206084,
+        "fp": 0,
+        "t9": 721061696,
+        "t1": 2145467040,
+        "sp": 2145466992,
+        "t6": 2,
+        "s5": 4390912,
+        "t0": 0,
+        "a2": 0,
+        "s4": 4390912,
+        "t4": 0,
+        "s0": 0,
+        "s8": 4285172,
+        "t2": 0,
+        "a3": 0,
+        "s6": 16,
+        "s3": 4379992,
+        "v1": 2145467024,
+        "t3": 2151006208,
+        "t8": 0,
+        "s2": 4378960,
+        "s1": 4285264,
+        "t7": 4101,
+        "s7": 4259840,
+        "a1": 2145467056,
+        "t5": 0,
+        "pc": 4206296
+    },
+    "segments": [
+        {
+            "permissions": {
+                "r": true,
+                "x": true,
+                "w": false
+            },
+            "name": "/usr/bin/tdpd",
+            "end": 4304896,
+            "content_file": "44299f61ac1d690c65ce73d7635fa99d.bin",
+            "start": 4194304
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "/usr/bin/tdpd",
+            "end": 4370432,
+            "content_file": "31f7b7d6be5ece878823c47125d79bea.bin",
+            "start": 4366336
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": true,
+                "w": true
+            },
+            "name": "[heap]",
+            "end": 4382720,
+            "content_file": "4035f978377938c36e3105b3373c2995.bin",
+            "start": 4370432
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": true,
+                "w": false
+            },
+            "name": "/lib/ld-uClibc-0.9.33.2.so",
+            "end": 717537280,
+            "content_file": "5091efdeb256e115d73844b72ae5b1e2.bin",
+            "start": 717512704
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "",
+            "end": 717541376,
+            "content_file": "9a7fcd0b7d26e75abd1870820d8c68bc.bin",
+            "start": 717537280
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "",
+            "end": 717549568,
+            "content_file": "d1e47987447f774daadebece7ca60540.bin",
+            "start": 717545472
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": false
+            },
+            "name": "/lib/ld-uClibc-0.9.33.2.so",
+            "end": 717602816,
+            "content_file": "aa055f2a9212ceafbbf62cdcb5a36ab8.bin",
+            "start": 717598720
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "/lib/ld-uClibc-0.9.33.2.so",
+            "end": 717606912,
+            "content_file": "459ff64ebf8d044b84a964198bb07723.bin",
+            "start": 717602816
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": true,
+                "w": false
+            },
+            "name": "/lib/libcutil.so",
+            "end": 717660160,
+            "content_file": "1d2653ac8f0b630605c74f15eff857cc.bin",
+            "start": 717606912
+        },
+        {
+            "permissions": {
+                "r": false,
+                "x": false,
+                "w": false
+            },
+            "name": "",
+            "end": 717721600,
+            "content_file": "",
+            "start": 717660160
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "/lib/libcutil.so",
+            "end": 717725696,
+            "content_file": "5f8f9bd84fa62a7c57d054cf6e8651bc.bin",
+            "start": 717721600
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": true,
+                "w": false
+            },
+            "name": "/lib/libos.so",
+            "end": 717754368,
+            "content_file": "7c005175389f9cf85b60c066beffef6d.bin",
+            "start": 717725696
+        },
+        {
+            "permissions": {
+                "r": false,
+                "x": false,
+                "w": false
+            },
+            "name": "",
+            "end": 717819904,
+            "content_file": "",
+            "start": 717754368
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "/lib/libos.so",
+            "end": 717824000,
+            "content_file": "54414d3bfffdbc2ad6ed480761af42c1.bin",
+            "start": 717819904
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": true,
+                "w": false
+            },
+            "name": "/lib/libcmm.so",
+            "end": 718872576,
+            "content_file": "bb9726587f76b261d349d9f57d027aed.bin",
+            "start": 717824000
+        },
+        {
+            "permissions": {
+                "r": false,
+                "x": false,
+                "w": false
+            },
+            "name": "",
+            "end": 718934016,
+            "content_file": "",
+            "start": 718872576
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "/lib/libcmm.so",
+            "end": 718962688,
+            "content_file": "01cad9aab5ccd05c8177225da565517a.bin",
+            "start": 718934016
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "",
+            "end": 719802368,
+            "content_file": "0539521ed0c49f8beb366d2389adbcb8.bin",
+            "start": 718962688
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": true,
+                "w": false
+            },
+            "name": "/lib/libxml.so",
+            "end": 719818752,
+            "content_file": "0bfdca2150080d4f5cd924bbed4f8b04.bin",
+            "start": 719802368
+        },
+        {
+            "permissions": {
+                "r": false,
+                "x": false,
+                "w": false
+            },
+            "name": "",
+            "end": 719880192,
+            "content_file": "",
+            "start": 719818752
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "/lib/libxml.so",
+            "end": 719884288,
+            "content_file": "831c88bd6a389da09ec223f5b686100c.bin",
+            "start": 719880192
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": true,
+                "w": false
+            },
+            "name": "/lib/libpthread-0.9.33.2.so",
+            "end": 719933440,
+            "content_file": "22417ca034bcdbf83fda5e6bf8802f37.bin",
+            "start": 719884288
+        },
+        {
+            "permissions": {
+                "r": false,
+                "x": false,
+                "w": false
+            },
+            "name": "",
+            "end": 719994880,
+            "content_file": "",
+            "start": 719933440
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": false
+            },
+            "name": "/lib/libpthread-0.9.33.2.so",
+            "end": 719998976,
+            "content_file": "8627f6901250b20081abbfe1bad4fca3.bin",
+            "start": 719994880
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "/lib/libpthread-0.9.33.2.so",
+            "end": 720019456,
+            "content_file": "2054e4a1f72aa79e39859570a4f7d72f.bin",
+            "start": 719998976
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "",
+            "end": 720027648,
+            "content_file": "723022280ff2f95806ac33e2b6cce741.bin",
+            "start": 720019456
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": true,
+                "w": false
+            },
+            "name": "/lib/librt-0.9.33.2.so",
+            "end": 720031744,
+            "content_file": "a70b7a777aa9f8b614c9a94a7e36ae53.bin",
+            "start": 720027648
+        },
+        {
+            "permissions": {
+                "r": false,
+                "x": false,
+                "w": false
+            },
+            "name": "",
+            "end": 720093184,
+            "content_file": "",
+            "start": 720031744
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "/lib/librt-0.9.33.2.so",
+            "end": 720097280,
+            "content_file": "03db6bb6ea9b37864e0462c4fef66ef1.bin",
+            "start": 720093184
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": true,
+                "w": false
+            },
+            "name": "/lib/libmobile.so",
+            "end": 720261120,
+            "content_file": "981c40a205aaf0a8afe029eff85f8d17.bin",
+            "start": 720097280
+        },
+        {
+            "permissions": {
+                "r": false,
+                "x": false,
+                "w": false
+            },
+            "name": "",
+            "end": 720322560,
+            "content_file": "",
+            "start": 720261120
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "/lib/libmobile.so",
+            "end": 720326656,
+            "content_file": "70142d2a53fa778215596a58cd1224c0.bin",
+            "start": 720322560
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": true,
+                "w": false
+            },
+            "name": "/lib/libltedatamgr.so",
+            "end": 720347136,
+            "content_file": "5106ebc4a3efaad6342f1eed3f428552.bin",
+            "start": 720326656
+        },
+        {
+            "permissions": {
+                "r": false,
+                "x": false,
+                "w": false
+            },
+            "name": "",
+            "end": 720408576,
+            "content_file": "",
+            "start": 720347136
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "/lib/libltedatamgr.so",
+            "end": 720412672,
+            "content_file": "fbca4739e115721553e47a2ffb352ca7.bin",
+            "start": 720408576
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": true,
+                "w": false
+            },
+            "name": "/lib/libflowstat.so",
+            "end": 720437248,
+            "content_file": "8abf0ee6affbdfaa74308a8c19a359d5.bin",
+            "start": 720412672
+        },
+        {
+            "permissions": {
+                "r": false,
+                "x": false,
+                "w": false
+            },
+            "name": "",
+            "end": 720498688,
+            "content_file": "",
+            "start": 720437248
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "/lib/libflowstat.so",
+            "end": 720502784,
+            "content_file": "57562aec77274daf8d2d39e29199ab96.bin",
+            "start": 720498688
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": true,
+                "w": false
+            },
+            "name": "/lib/libm-0.9.33.2.so",
+            "end": 720596992,
+            "content_file": "12358ede0449f09856c5546244cc51dd.bin",
+            "start": 720502784
+        },
+        {
+            "permissions": {
+                "r": false,
+                "x": false,
+                "w": false
+            },
+            "name": "",
+            "end": 720658432,
+            "content_file": "",
+            "start": 720596992
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "/lib/libm-0.9.33.2.so",
+            "end": 720662528,
+            "content_file": "eaed2df1bb8abe89c3ac047e6ece9fac.bin",
+            "start": 720658432
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": true,
+                "w": false
+            },
+            "name": "/lib/libcJSON.so",
+            "end": 720683008,
+            "content_file": "3c368c24afc389f8b60aaade21b8e1eb.bin",
+            "start": 720662528
+        },
+        {
+            "permissions": {
+                "r": false,
+                "x": false,
+                "w": false
+            },
+            "name": "",
+            "end": 720748544,
+            "content_file": "",
+            "start": 720683008
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "/lib/libcJSON.so",
+            "end": 720752640,
+            "content_file": "094bc4add57dc49810e75c01d9e941b2.bin",
+            "start": 720748544
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": true,
+                "w": false
+            },
+            "name": "/lib/libgcc_s.so.1",
+            "end": 720932864,
+            "content_file": "59945ec3a93ca6f1e610ee3a6767ba26.bin",
+            "start": 720752640
+        },
+        {
+            "permissions": {
+                "r": false,
+                "x": false,
+                "w": false
+            },
+            "name": "",
+            "end": 720994304,
+            "content_file": "",
+            "start": 720932864
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "/lib/libgcc_s.so.1",
+            "end": 720998400,
+            "content_file": "d1a562372892ddf1bc9a8916d7222d14.bin",
+            "start": 720994304
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": true,
+                "w": false
+            },
+            "name": "/lib/libuClibc-0.9.33.2.so",
+            "end": 721387520,
+            "content_file": "5318b95c00f4441c2260581b5765d46a.bin",
+            "start": 720998400
+        },
+        {
+            "permissions": {
+                "r": false,
+                "x": false,
+                "w": false
+            },
+            "name": "",
+            "end": 721448960,
+            "content_file": "",
+            "start": 721387520
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": false
+            },
+            "name": "/lib/libuClibc-0.9.33.2.so",
+            "end": 721453056,
+            "content_file": "23228c9b3bd5271a0ae084690a105c7b.bin",
+            "start": 721448960
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "/lib/libuClibc-0.9.33.2.so",
+            "end": 721457152,
+            "content_file": "da18ac1771c2a2bb9b020378ebbf483f.bin",
+            "start": 721453056
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "",
+            "end": 721477632,
+            "content_file": "f0573f7d23f543a6e87796ed39772f7e.bin",
+            "start": 721457152
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": true,
+                "w": false
+            },
+            "name": "/lib/libdl-0.9.33.2.so",
+            "end": 721485824,
+            "content_file": "27f7bef031a6de9b64bba37dd2425963.bin",
+            "start": 721477632
+        },
+        {
+            "permissions": {
+                "r": false,
+                "x": false,
+                "w": false
+            },
+            "name": "",
+            "end": 721547264,
+            "content_file": "",
+            "start": 721485824
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": false
+            },
+            "name": "/lib/libdl-0.9.33.2.so",
+            "end": 721551360,
+            "content_file": "ed666607ce78eff36fdae3ac7c9b3143.bin",
+            "start": 721547264
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "/lib/libdl-0.9.33.2.so",
+            "end": 721555456,
+            "content_file": "04d1184cd1d92895b38242da4d17d3b0.bin",
+            "start": 721551360
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": true,
+                "w": false
+            },
+            "name": "/lib/libstdc++.so.6.0.16",
+            "end": 722100224,
+            "content_file": "24768e0d080b3173bc90422cb02d39e5.bin",
+            "start": 721555456
+        },
+        {
+            "permissions": {
+                "r": false,
+                "x": false,
+                "w": false
+            },
+            "name": "",
+            "end": 722165760,
+            "content_file": "",
+            "start": 722100224
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": false
+            },
+            "name": "/lib/libstdc++.so.6.0.16",
+            "end": 722186240,
+            "content_file": "0eaab8acc98c3baeebcf31e81cf99261.bin",
+            "start": 722165760
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "/lib/libstdc++.so.6.0.16",
+            "end": 722194432,
+            "content_file": "833b326bf8599d05107bafd19a3284fa.bin",
+            "start": 722186240
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "",
+            "end": 722214912,
+            "content_file": "b61633ce600daeba4a8c254f7022a3b0.bin",
+            "start": 722194432
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": false,
+                "w": true
+            },
+            "name": "",
+            "end": 1485398016,
+            "content_file": "b4b72a11ca71deaddf6acca117079326.bin",
+            "start": 1484783616
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": true,
+                "w": true
+            },
+            "name": "[stack]",
+            "end": 2145468416,
+            "content_file": "7f2e2c098c0bef1c640c81eb40c2b330.bin",
+            "start": 2145333248
+        },
+        {
+            "permissions": {
+                "r": true,
+                "x": true,
+                "w": false
+            },
+            "name": "[vdso]",
+            "end": 2147450880,
+            "content_file": "77b0b6bbced842a4cc67e59b22332608.bin",
+            "start": 2147446784
+        }
+    ]
+}
