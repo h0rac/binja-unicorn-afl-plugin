@@ -15,7 +15,10 @@ import argparse
 from unicorn import *
 from unicorn.mips_const import *  # TODO: Set correct architecture here as necessary
 from textwrap import wrap
-import unicorn_loader 
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+from core import unicorn_loader 
 import json
 
 # Simple stand-in heap to prevent OS/kernel issues
