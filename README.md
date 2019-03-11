@@ -18,3 +18,7 @@ Data is also saved as json with same format. Save data could be loaded to harnes
 #### core folder is a package with unicorn_loader.py to allow load context data to unicorn
 
 #### sample folder include your harness python test file inputs, outputs folder and dumped memory
+
+#### Plugin usage example
+
+https://drive.google.com/file/d/1ny1zEis33anSpt02jMGQh85QI1Ipv02G/view?usp=sharing
